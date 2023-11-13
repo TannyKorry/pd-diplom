@@ -20,7 +20,7 @@ class CustomUserAdmin(UserAdmin):
         }),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
-    list_display = ('email', 'first_name', 'last_name', 'is_staff')
+    list_display = ('email', 'first_name', 'last_name', 'position', 'company', 'is_staff', 'type')
 
 
 @admin.register(Shop)
@@ -33,14 +33,22 @@ class CategoryAdmin(admin.ModelAdmin):
     pass
 
 
+class ProductParameterInline(admin.TabularInline):
+    model = ProductParameter
+    extra = 0
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['id', 'name', ]
+    list_filter = ['name', ]
+    # inlines = [ProductParameterInline, ]
 
 
 @admin.register(ProductInfo)
 class ProductInfoAdmin(admin.ModelAdmin):
-    pass
+    inlines = [ProductParameterInline, ]
+
 
 
 @admin.register(Parameter)
@@ -50,7 +58,8 @@ class ParameterAdmin(admin.ModelAdmin):
 
 @admin.register(ProductParameter)
 class ProductParameterAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['id', 'product_info', 'parameter', 'value', ]
+    list_filter = ['product_info', 'parameter', ]
 
 
 @admin.register(Order)

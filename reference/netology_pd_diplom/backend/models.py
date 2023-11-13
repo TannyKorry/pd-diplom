@@ -22,9 +22,6 @@ USER_TYPE_CHOICES = (
 )
 
 
-# Create your models here.
-
-
 class UserManager(BaseUserManager):
     """
     Миксин для управления пользователями
@@ -208,9 +205,14 @@ class Contact(models.Model):
     class Meta:
         verbose_name = 'Контакты пользователя'
         verbose_name_plural = "Список контактов пользователя"
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'city', 'street', 'house', 'structure', 'building', 'apartment', 'phone', ],
+                name='unique_user_contact'),
+        ]
 
     def __str__(self):
-        return f'{self.city} {self.street} {self.house}'
+        return f'{self.user}: {self.city} {self.street} {self.house} {self.apartment}  tel.: {self.phone}'
 
 
 class Order(models.Model):
