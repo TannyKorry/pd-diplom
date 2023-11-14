@@ -20,7 +20,7 @@ class CustomUserAdmin(UserAdmin):
         }),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
-    list_display = ('email', 'first_name', 'last_name', 'position', 'company', 'is_staff', 'type')
+    list_display = ('email', 'first_name', 'last_name', 'position', 'company', 'is_staff', 'type', 'is_active', )
 
 
 @admin.register(Shop)

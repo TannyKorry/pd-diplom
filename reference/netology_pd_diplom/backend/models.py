@@ -76,10 +76,12 @@ class User(AbstractUser):
         error_messages={
             'unique': _("A user with that username already exists."),
         },
+        null=True,
+        blank=True,
     )
     is_active = models.BooleanField(
         _('active'),
-        default=True,
+        default=False,
         help_text=_(
             'Designates whether this user should be treated as active. '
             'Unselect this instead of deleting accounts.'
@@ -88,7 +90,7 @@ class User(AbstractUser):
     type = models.CharField(verbose_name='Тип пользователя', choices=USER_TYPE_CHOICES, max_length=5, default='buyer')
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.first_name} {self.last_name} Статус: {self.is_active}'
 
     class Meta:
         verbose_name = 'Пользователь'

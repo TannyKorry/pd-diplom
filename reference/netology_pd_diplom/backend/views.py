@@ -31,7 +31,6 @@ class RegisterAccount(APIView):
 
         # проверяем обязательные аргументы
         if {'first_name', 'last_name', 'email', 'password', 'company', 'position'}.issubset(request.data):
-            errors = {}
 
             # проверяем пароль на сложность
 
@@ -54,7 +53,7 @@ class RegisterAccount(APIView):
                     user.set_password(request.data['password'])
                     user.save()
                     new_user_registered.send(sender=self.__class__, user_id=user.id)
-                    return JsonResponse({'Status': True})
+                    return JsonResponse({'Status': True, 'Message': 'User created'}, status=201)
                 else:
                     return JsonResponse({'Status': False, 'Errors': user_serializer.errors})
 
