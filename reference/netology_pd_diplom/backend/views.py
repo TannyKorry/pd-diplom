@@ -7,6 +7,7 @@ from django.core.validators import URLValidator
 from django.db import IntegrityError
 from django.db.models import Q, Sum, F
 from django.http import JsonResponse
+from django.views.generic import TemplateView
 from requests import get
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import ListAPIView
@@ -15,11 +16,12 @@ from rest_framework.views import APIView
 from ujson import loads as load_json
 from yaml import load as load_yaml, Loader
 
-from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, Order, OrderItem, \
+from .forms import LogInForm
+from .models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, Order, OrderItem, \
     Contact, ConfirmEmailToken
-from backend.serializers import UserSerializer, CategorySerializer, ShopSerializer, ProductInfoSerializer, \
+from .serializers import UserSerializer, CategorySerializer, ShopSerializer, ProductInfoSerializer, \
     OrderItemSerializer, OrderSerializer, ContactSerializer
-from backend.signals import new_user_registered, new_order
+from .signals import new_user_registered, new_order
 
 
 class RegisterAccount(APIView):
@@ -33,7 +35,6 @@ class RegisterAccount(APIView):
         if {'first_name', 'last_name', 'email', 'password', 'company', 'position'}.issubset(request.data):
 
             # проверяем пароль на сложность
-
             try:
                 validate_password(request.data['password'])
             except Exception as password_error:
@@ -100,10 +101,10 @@ class AccountDetails(APIView):
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
-        # проверяем обязательные аргументы
 
+        # проверяем обязательные аргументы
         if 'password' in request.data:
-            errors = {}
+
             # проверяем пароль на сложность
             try:
                 validate_password(request.data['password'])
@@ -129,7 +130,10 @@ class LoginAccount(APIView):
     """
     Класс для авторизации пользователей
     """
+    template_name = 'login.html'
+    form_class = LogInForm
     # Авторизация методом POST
+
     def post(self, request, *args, **kwargs):
 
         if {'email', 'password'}.issubset(request.data):
@@ -500,3 +504,8 @@ class OrderView(APIView):
                         return JsonResponse({'Status': True})
 
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+
+
+# стартовая страница
+class HomeView(TemplateView):
+    template_name = 'base.html'

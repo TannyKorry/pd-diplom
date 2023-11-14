@@ -3,7 +3,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.dispatch import receiver, Signal
 from django_rest_passwordreset.signals import reset_password_token_created
 
-from backend.models import ConfirmEmailToken, User
+from .models import ConfirmEmailToken, User
 
 new_user_registered = Signal(
     ['user_id'],
@@ -64,7 +64,7 @@ def new_user_registered_signal(user_id, **kwargs):
 @receiver(new_order)
 def new_order_signal(user_id, **kwargs):
     """
-    отправяем письмо при изменении статуса заказа
+    отправляем письмо при изменении статуса заказа
     """
     # send an e-mail to the user
     user = User.objects.get(id=user_id)

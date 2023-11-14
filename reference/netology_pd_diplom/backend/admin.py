@@ -42,7 +42,7 @@ class ProductParameterInline(admin.TabularInline):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', ]
     list_filter = ['name', ]
-    # inlines = [ProductParameterInline, ]
+
 
 
 @admin.register(ProductInfo)

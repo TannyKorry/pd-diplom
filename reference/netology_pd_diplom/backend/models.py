@@ -90,11 +90,11 @@ class User(AbstractUser):
     type = models.CharField(verbose_name='Тип пользователя', choices=USER_TYPE_CHOICES, max_length=5, default='buyer')
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name} Статус: {self.is_active}'
+        return f' Статус: {self.is_active}.   Пользователь: {self.first_name} {self.last_name}'
 
     class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = "Список пользователей"
+        verbose_name = 'Пользователь(User)'
+        verbose_name_plural = "Список пользователей(User)"
         ordering = ('email',)
 
 
@@ -109,8 +109,8 @@ class Shop(models.Model):
     # filename
 
     class Meta:
-        verbose_name = 'Магазин'
-        verbose_name_plural = "Список магазинов"
+        verbose_name = 'Магазин(Shop)'
+        verbose_name_plural = "Список магазинов(Shop)"
         ordering = ('-name',)
 
     def __str__(self):
@@ -122,8 +122,8 @@ class Category(models.Model):
     shops = models.ManyToManyField(Shop, verbose_name='Магазины', related_name='categories', blank=True)
 
     class Meta:
-        verbose_name = 'Категория'
-        verbose_name_plural = "Список категорий"
+        verbose_name = 'Категория(Category)'
+        verbose_name_plural = "Список категорий(Category)"
         ordering = ('-name',)
 
     def __str__(self):
@@ -136,8 +136,8 @@ class Product(models.Model):
                                  on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = 'Продукт'
-        verbose_name_plural = "Список продуктов"
+        verbose_name = 'Продукт(Product)'
+        verbose_name_plural = "Перечень номенклатуры(Product)"
         ordering = ('-name',)
 
     def __str__(self):
@@ -156,8 +156,8 @@ class ProductInfo(models.Model):
     price_rrc = models.PositiveIntegerField(verbose_name='Рекомендуемая розничная цена')
 
     class Meta:
-        verbose_name = 'Информация о продукте'
-        verbose_name_plural = "Информационный список о продуктах"
+        verbose_name = 'Данные о продукте(Pricat)'
+        verbose_name_plural = "Список данных о продуктах(Pricat)"
         constraints = [
             models.UniqueConstraint(fields=['product', 'shop', 'external_id'], name='unique_product_info'),
         ]
@@ -167,8 +167,8 @@ class Parameter(models.Model):
     name = models.CharField(max_length=40, verbose_name='Название')
 
     class Meta:
-        verbose_name = 'Имя параметра'
-        verbose_name_plural = "Список имен параметров"
+        verbose_name = 'Название параметра(Parameter)'
+        verbose_name_plural = "Список названий параметров(Parameter)"
         ordering = ('-name',)
 
     def __str__(self):
@@ -184,8 +184,8 @@ class ProductParameter(models.Model):
     value = models.CharField(verbose_name='Значение', max_length=100)
 
     class Meta:
-        verbose_name = 'Параметр'
-        verbose_name_plural = "Список параметров"
+        verbose_name = 'Параметр товара(ProductParameter)'
+        verbose_name_plural = "Список параметров товара(ProductParameter)"
         constraints = [
             models.UniqueConstraint(fields=['product_info', 'parameter'], name='unique_product_parameter'),
         ]
@@ -205,8 +205,8 @@ class Contact(models.Model):
     phone = models.CharField(max_length=20, verbose_name='Телефон')
 
     class Meta:
-        verbose_name = 'Контакты пользователя'
-        verbose_name_plural = "Список контактов пользователя"
+        verbose_name = 'Контакты пользователя(Contact)'
+        verbose_name_plural = "Список контактов пользователя(Contact)"
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'city', 'street', 'house', 'structure', 'building', 'apartment', 'phone', ],
@@ -228,8 +228,8 @@ class Order(models.Model):
                                 on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = 'Заказ'
-        verbose_name_plural = "Список заказ"
+        verbose_name = 'Заказ(Order)'
+        verbose_name_plural = "Список заказов(Order)"
         ordering = ('-dt',)
 
     def __str__(self):
@@ -250,8 +250,8 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField(verbose_name='Количество')
 
     class Meta:
-        verbose_name = 'Заказанная позиция'
-        verbose_name_plural = "Список заказанных позиций"
+        verbose_name = 'Заказанная позиция(OrderItem)'
+        verbose_name_plural = "Список заказанных позиций(OrderItem)"
         constraints = [
             models.UniqueConstraint(fields=['order_id', 'product_info'], name='unique_order_item'),
         ]

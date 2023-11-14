@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_rest_passwordreset',
+
+    'allauth',
+    'allauth.account',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'netology_pd_diplom.urls'
@@ -142,6 +146,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'backend.User'
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_USE_TLS = True
 
@@ -163,11 +172,16 @@ REST_FRAMEWORK = {
     ),
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'rest_framework.authentication.SessionAuthentication',
-        # 'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
 
 }
 
 SITE_ID = 1
+
+
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3       # Срок действия подтверждения по электронной почте 3 дня
+ACCOUNT_EMAIL_REQUIRED = True                    # Для активации требуется адрес электронной почты
+ACCOUNT_EMAIL_VERIFICATION = 'none'#'mandatory'         # Разрешить пользователю входить в систему без электронного письма
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'                # Перенаправление URL-адреса входа в систему
+LOGIN_REDIRECT_URL = '/accounts/email/'          # Перенаправление URL-адреса выхода из системы
