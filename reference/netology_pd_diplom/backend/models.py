@@ -103,7 +103,7 @@ class Shop(models.Model):
     url = models.URLField(verbose_name='Ссылка', null=True, blank=True)
     user = models.OneToOneField(User, verbose_name='Пользователь',
                                 blank=True, null=True,
-                                on_delete=models.CASCADE)
+                                on_delete=models.SET_NULL)
     state = models.BooleanField(verbose_name='статус получения заказов', default=True)
 
     # filename

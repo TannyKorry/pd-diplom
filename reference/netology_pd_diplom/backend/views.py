@@ -54,7 +54,7 @@ class RegisterAccount(APIView):
                     user.set_password(request.data['password'])
                     user.save()
                     new_user_registered.send(sender=self.__class__, user_id=user.id)
-                    return JsonResponse({'Status': True, 'Message': 'User created'}, status=201)
+                    return JsonResponse({'Status': True, 'Message': 'На ваш email отправлено письмо с кодом подтверждения'}, status=201)
                 else:
                     return JsonResponse({'Status': False, 'Errors': user_serializer.errors})
 
@@ -130,8 +130,8 @@ class LoginAccount(APIView):
     """
     Класс для авторизации пользователей
     """
-    template_name = 'login.html'
-    form_class = LogInForm
+    # template_name = 'login.html'
+    # form_class = LogInForm
     # Авторизация методом POST
 
     def post(self, request, *args, **kwargs):

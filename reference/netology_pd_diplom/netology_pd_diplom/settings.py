@@ -39,12 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
     'backend.apps.BackendConfig',
+
     'rest_framework',
     'rest_framework.authtoken',
     'django_rest_passwordreset',
 
-    'allauth',
+    # 'allauth',
     'allauth.account',
 ]
 
@@ -151,15 +154,21 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_USE_TLS = True
 
-EMAIL_HOST = 'smtp.mail.ru'
-EMAIL_HOST_USER = 'netology-pdiplom@mail.ru'
-EMAIL_HOST_PASSWORD = 'i~8W4rdRPFlo'
-EMAIL_PORT = '465'
-EMAIL_USE_SSL = True
+# smtp settings
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL')
 SERVER_EMAIL = EMAIL_HOST_USER
+
+
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -182,6 +191,6 @@ SITE_ID = 1
 
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3       # Срок действия подтверждения по электронной почте 3 дня
 ACCOUNT_EMAIL_REQUIRED = True                    # Для активации требуется адрес электронной почты
-ACCOUNT_EMAIL_VERIFICATION = 'none'#'mandatory'         # Разрешить пользователю входить в систему без электронного письма
-ACCOUNT_LOGOUT_REDIRECT_URL = '/'                # Перенаправление URL-адреса входа в систему
-LOGIN_REDIRECT_URL = '/accounts/email/'          # Перенаправление URL-адреса выхода из системы
+ACCOUNT_EMAIL_VERIFICATION = 'none' #'mandatory' # Разрешить пользователю входить в систему без электронного письма
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'                # Перенаправление URL-адреса домашней страницы
+LOGIN_REDIRECT_URL = 'api/v1/categories/'        # Перенаправление URL-адреса выхода из системы
