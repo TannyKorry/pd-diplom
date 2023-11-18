@@ -414,15 +414,23 @@ class ContactView(APIView):
         if {'city', 'street', 'phone'}.issubset(request.data):
             request.data._mutable = True
             request.data.update({'user': request.user.id})
-            serializer = ContactSerializer(data=request.data)
 
-            if serializer.is_valid():
-                serializer.save()
-                return JsonResponse({'Status': True, 'Контактные данные записаны id': serializer.data['id']})
+            contact = Contact.objects.filter(
+                user_id=request.user.id)
+
+            if contact:
+                return JsonResponse(
+                    {'Status': False, 'Error': 'У вас уже есть зарегистрированные контактные данные'})
             else:
-                JsonResponse({'Status': False, 'Errors': serializer.errors})
+                serializer = ContactSerializer(data=request.data)
 
-        return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+                if serializer.is_valid():
+                    serializer.save()
+                    return JsonResponse({'Status': True, 'Контактные данные записаны id': serializer.data['id']})
+                else:
+                    JsonResponse({'Status': False, 'Errors': serializer.errors})
+
+            return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
 
     # удалить контакт
     def delete(self, request, *args, **kwargs):
@@ -452,7 +460,7 @@ class ContactView(APIView):
         if 'id' in request.data:
             if request.data['id'].isdigit():
                 contact = Contact.objects.filter(id=request.data['id'], user_id=request.user.id).first()
-                print(contact)
+
                 if contact:
                     serializer = ContactSerializer(contact, data=request.data, partial=True)
                     if serializer.is_valid():
@@ -462,6 +470,7 @@ class ContactView(APIView):
                         JsonResponse({'Status': False, 'Errors': serializer.errors})
 
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+
 
 
 class OrderView(APIView):

@@ -208,11 +208,6 @@ class Contact(models.Model):
     class Meta:
         verbose_name = 'Контакты пользователя(Contact)'
         verbose_name_plural = "Список контактов пользователя(Contact)"
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'city', 'street', 'house', 'apartment', 'phone', ],
-                name='unique_user_contact'),
-        ]
 
     def __str__(self):
         return f'{self.user}: {self.city} {self.street} {self.house} {self.apartment}  tel.: {self.phone}'
