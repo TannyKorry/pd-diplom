@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 from ujson import loads as load_json
 from yaml import load as load_yaml, Loader
 
-from .forms import LogInForm
+
 from .models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, Order, OrderItem, \
     Contact, ConfirmEmailToken
 from .serializers import UserSerializer, CategorySerializer, ShopSerializer, ProductInfoSerializer, \
@@ -130,9 +130,6 @@ class LoginAccount(APIView):
     """
     Класс для авторизации пользователей
     """
-    # template_name = 'login.html'
-    # form_class = LogInForm
-    # Авторизация методом POST
 
     def post(self, request, *args, **kwargs):
 
@@ -227,6 +224,7 @@ class BasketView(APIView):
                 objects_created = 0
                 for order_item in items_dict:
                     order_item.update({'order': basket.id})
+
                     serializer = OrderItemSerializer(data=order_item)
                     if serializer.is_valid():
                         try:
@@ -279,7 +277,7 @@ class BasketView(APIView):
                 basket, _ = Order.objects.get_or_create(user_id=request.user.id, state='basket')
                 objects_updated = 0
                 for order_item in items_dict:
-                    if type(order_item['id']) == int and type(order_item['quantity']) == int:
+                    if order_item['id'].isdigit() and order_item['quantity'].isdigit():
                         objects_updated += OrderItem.objects.filter(order_id=basket.id, id=order_item['id']).update(
                             quantity=order_item['quantity'])
 
@@ -405,6 +403,7 @@ class ContactView(APIView):
         contact = Contact.objects.filter(
             user_id=request.user.id)
         serializer = ContactSerializer(contact, many=True)
+        print(serializer.data)
         return Response(serializer.data)
 
     # добавить новый контакт
@@ -419,7 +418,7 @@ class ContactView(APIView):
 
             if serializer.is_valid():
                 serializer.save()
-                return JsonResponse({'Status': True})
+                return JsonResponse({'Status': True, 'Контактные данные записаны id': serializer.data['id']})
             else:
                 JsonResponse({'Status': False, 'Errors': serializer.errors})
 

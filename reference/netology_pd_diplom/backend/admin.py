@@ -74,7 +74,7 @@ class OrderItemAdmin(admin.ModelAdmin):
 
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('id', 'user', 'phone',)
 
 
 @admin.register(ConfirmEmailToken)

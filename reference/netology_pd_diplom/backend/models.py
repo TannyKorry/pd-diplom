@@ -57,6 +57,7 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
+
 class User(AbstractUser):
     """
     Стандартная модель пользователей
@@ -98,6 +99,7 @@ class User(AbstractUser):
         ordering = ('email',)
 
 
+
 class Shop(models.Model):
     name = models.CharField(max_length=50, verbose_name='Название')
     url = models.URLField(verbose_name='Ссылка', null=True, blank=True)
@@ -106,8 +108,6 @@ class Shop(models.Model):
                                 on_delete=models.SET_NULL)
     state = models.BooleanField(verbose_name='статус получения заказов', default=True)
 
-    # filename
-
     class Meta:
         verbose_name = 'Магазин(Shop)'
         verbose_name_plural = "Список магазинов(Shop)"
@@ -115,6 +115,7 @@ class Shop(models.Model):
 
     def __str__(self):
         return self.name
+
 
 
 class Category(models.Model):
@@ -132,8 +133,8 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=80, verbose_name='Название')
-    category = models.ForeignKey(Category, verbose_name='Категория', related_name='products', blank=True,
-                                 on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, verbose_name='Категория', related_name='products', blank=True, null=True,
+                                 on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = 'Продукт(Product)'
@@ -209,7 +210,7 @@ class Contact(models.Model):
         verbose_name_plural = "Список контактов пользователя(Contact)"
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'city', 'street', 'house', 'structure', 'building', 'apartment', 'phone', ],
+                fields=['user', 'city', 'street', 'house', 'apartment', 'phone', ],
                 name='unique_user_contact'),
         ]
 

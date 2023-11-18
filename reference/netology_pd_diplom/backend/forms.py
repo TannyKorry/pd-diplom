@@ -1,7 +1,9 @@
 from allauth.account.forms import SignupForm
+from allauth.account.views import AjaxCapableProcessFormViewMixin, RedirectAuthenticatedUserMixin
 from django import forms
+from django.views.generic import FormView
 
-from .models import USER_TYPE_CHOICES
+from .models import USER_TYPE_CHOICES, User
 
 
 class CustomSignupForm(SignupForm):
