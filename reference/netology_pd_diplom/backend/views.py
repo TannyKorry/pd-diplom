@@ -408,6 +408,9 @@ class ContactView(APIView):
 
     # добавить новый контакт
     def post(self, request, *args, **kwargs):
+        '''
+        У пользователя может быть только один контакт
+        '''
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
@@ -432,44 +435,52 @@ class ContactView(APIView):
 
             return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
 
+
     # удалить контакт
     def delete(self, request, *args, **kwargs):
+        '''
+        У пользователя может быть только один контакт, поэтому для удаления передавать его id не требуется
+        '''
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
-        items_sting = request.data.get('items')
-        if items_sting:
-            items_list = items_sting.split(',')
+        contact = Contact.objects.filter(user_id=request.user.id)
+        serializer = ContactSerializer(contact, many=True)
+
+        items_list = [i['id'] for i in serializer.data]
+
+        if items_list:
             query = Q()
             objects_deleted = False
             for contact_id in items_list:
-                if contact_id.isdigit():
-                    query = query | Q(user_id=request.user.id, id=contact_id)
-                    objects_deleted = True
+                query = query | Q(user_id=request.user.id, id=contact_id)
+                objects_deleted = True
 
             if objects_deleted:
                 deleted_count = Contact.objects.filter(query).delete()[0]
                 return JsonResponse({'Status': True, 'Удалено объектов': deleted_count})
-        return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+        return JsonResponse({'Status': False, 'Errors': 'У вас нет контактных данных'})
+
 
     # редактировать контакт
     def put(self, request, *args, **kwargs):
+        '''
+        У пользователя может быть только один контакт, поэтому для изменения передавать его id не требуется
+        '''
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
-        if 'id' in request.data:
-            if request.data['id'].isdigit():
-                contact = Contact.objects.filter(id=request.data['id'], user_id=request.user.id).first()
+        contact = Contact.objects.filter(user_id=request.user.id).first()
 
-                if contact:
-                    serializer = ContactSerializer(contact, data=request.data, partial=True)
-                    if serializer.is_valid():
-                        serializer.save()
-                        return JsonResponse({'Status': True})
-                    else:
-                        JsonResponse({'Status': False, 'Errors': serializer.errors})
+        if contact:
+            serializer = ContactSerializer(contact, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse({'Status': True})
+            else:
+                JsonResponse({'Status': False, 'Errors': serializer.errors})
 
-        return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+        return JsonResponse({'Status': False, 'Errors': 'У вас пока нет контактных данных'})
 
 
 

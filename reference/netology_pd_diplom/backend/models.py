@@ -210,7 +210,7 @@ class Contact(models.Model):
         verbose_name_plural = "Список контактов пользователя(Contact)"
 
     def __str__(self):
-        return f'{self.user}: {self.city} {self.street} {self.house} {self.apartment}  tel.: {self.phone}'
+        return f'{self.user}: {self.id}.{self.city} {self.street} {self.house} {self.apartment}  tel.: {self.phone}'
 
 
 class Order(models.Model):
