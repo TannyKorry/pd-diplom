@@ -301,19 +301,24 @@ class PartnerUpdate(APIView):
             validate_url = URLValidator()
             try:
                 validate_url(url)
-            except ValidationError as e:
-                return JsonResponse({'Status': False, 'Error': str(e)})
+            except ValidationError as er:
+                return JsonResponse({'Status': False, 'Error': str(er)})
             else:
                 stream = get(url).content
 
                 data = load_yaml(stream, Loader=Loader)
 
-                shop, _ = Shop.objects.get_or_create(name=data['shop'], user_id=request.user.id)
+                for shop in data['shop']:
+                    shop, _ = Shop.objects.update_or_create(name=data['shop'], url=url)
+
                 for category in data['categories']:
                     category_object, _ = Category.objects.get_or_create(id=category['id'], name=category['name'])
+
                     category_object.shops.add(shop.id)
+
                     category_object.save()
                 ProductInfo.objects.filter(shop_id=shop.id).delete()
+
                 for item in data['goods']:
                     product, _ = Product.objects.get_or_create(name=item['name'], category_id=item['category'])
 

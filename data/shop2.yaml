@@ -1,0 +1,57 @@
+shop: MTS
+categories:
+  - id: 224
+    name: Смартфоны
+  - id: 15
+    name: Аксессуары
+  - id: 1
+    name: Flash-накопители
+
+goods:
+  - id: 421
+    category: 224
+    model: apple/iphone/xs-max
+    name: Смартфон Apple iPhone XS Max 512GB (золотистый)
+    price: 108000
+    price_rrc: 116990
+    quantity: 3
+    parameters:
+      "Диагональ (дюйм)": 6.5
+      "Разрешение (пикс)": 2688x1242
+      "Встроенная память (Гб)": 512
+      "Цвет": золотистый
+  - id: 423
+    category: 224
+    model: apple/iphone/xr
+    name: Смартфон Apple iPhone XR 256GB (красный)
+    price: 61200
+    price_rrc: 69990
+    quantity: 6
+    parameters:
+      "Диагональ (дюйм)": 6.1
+      "Разрешение (пикс)": 1792x828
+      "Встроенная память (Гб)": 256
+      "Цвет": красный
+  - id: 416
+    category: 1
+    model: SDCS2/64GBSP
+    name: Карта памяти microSDXC UHS-I Kingston Canvas Select Plus 64 ГБ
+    price: 239
+    price_rrc: 490
+    quantity: 58
+    parameters:
+      "Емкость (Гб)": 64
+      "Показатель скорости чтения": 100X
+      "Тип": microSDXC
+      "Цвет": черный
+  - id: 467
+    category: 15
+    model: A1480
+    name: Кабель Apple A1480 Lightning(m)-USB(m) 1м MFI (белый)
+    price: 1460
+    price_rrc: 2190
+    quantity: 13
+    parameters:
+      "Длина кабеля (m)" : 1
+      "Разъем для подключения периферийного устройства": USB (m)
+      "Цвет": белый
