@@ -101,9 +101,12 @@ class User(AbstractUser):
 
 
 class Shop(models.Model):
-    name = models.CharField(max_length=50, verbose_name='Название')
+    name = models.CharField(max_length=50, verbose_name='Название', unique=True)
     url = models.URLField(verbose_name='Ссылка', null=True, blank=True)
     state = models.BooleanField(verbose_name='статус получения заказов', default=True)
+    user = models.ForeignKey(User, verbose_name='Пользователь',
+                                blank=True, null=True,
+                                on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = 'Магазин(Shop)'
@@ -152,14 +155,16 @@ class ProductInfo(models.Model):
     quantity = models.PositiveIntegerField(verbose_name='Количество')
     price = models.PositiveIntegerField(verbose_name='Цена')
     price_rrc = models.PositiveIntegerField(verbose_name='Рекомендуемая розничная цена')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления информации')
 
     class Meta:
         verbose_name = 'Данные о продукте(Pricat)'
         verbose_name_plural = "Список данных о продуктах(Pricat)"
 
 
+
 class Parameter(models.Model):
-    name = models.CharField(max_length=40, verbose_name='Название')
+    name = models.CharField(max_length=50, verbose_name='Название')
 
     class Meta:
         verbose_name = 'Название параметра(Parameter)'

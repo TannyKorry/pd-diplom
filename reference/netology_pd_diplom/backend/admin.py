@@ -25,7 +25,7 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Shop)
 class ShopAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', ]
+    list_display = ['id', 'name', 'url']
 
 
 @admin.register(Category)
@@ -47,6 +47,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(ProductInfo)
 class ProductInfoAdmin(admin.ModelAdmin):
+    list_display = ['updated_at', 'shop', 'model']
     inlines = [ProductParameterInline, ]
 
 
