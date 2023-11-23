@@ -104,7 +104,7 @@ class Shop(models.Model):
     name = models.CharField(max_length=50, verbose_name='Название', unique=True)
     url = models.URLField(verbose_name='Ссылка', null=True, blank=True)
     state = models.BooleanField(verbose_name='статус получения заказов', default=True)
-    user = models.ForeignKey(User, verbose_name='Пользователь',
+    user = models.ForeignKey(User, verbose_name='Пользователь', related_name='user',
                                 blank=True, null=True,
                                 on_delete=models.SET_NULL)
 

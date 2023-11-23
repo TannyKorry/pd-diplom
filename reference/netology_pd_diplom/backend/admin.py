@@ -25,7 +25,7 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Shop)
 class ShopAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'url']
+    list_display = ['id', 'name', 'url', 'user']
 
 
 @admin.register(Category)

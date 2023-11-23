@@ -309,12 +309,10 @@ class PartnerUpdate(APIView):
                 data = load_yaml(stream, Loader=Loader)
 
                 shop, _ = Shop.objects.get_or_create(name=data['shop'])
-                shop= Shop.objects.filter(name=data['shop']).update(url=url, user_id=request.user.id)
-
+                shop_up = Shop.objects.filter(name=data['shop']).update(url=url, user_id=request.user.id)
 
                 for category in data['categories']:
                     category_object, _ = Category.objects.get_or_create(id=category['id'], name=category['name'])
-                    # print(category_object)
                     category_object.shops.add(shop.id)
                     category_object.save()
                 ProductInfo.objects.filter(shop_id=shop.id).delete()
@@ -335,7 +333,7 @@ class PartnerUpdate(APIView):
                                                         parameter_id=parameter_object.id,
                                                         value=value)
 
-                return JsonResponse({'Status': True, '': 'Данные загружены'})
+                return JsonResponse({'Status': True, '': 'The data has been uploaded'})
 
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
 
