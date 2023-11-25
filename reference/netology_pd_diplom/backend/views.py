@@ -351,8 +351,8 @@ class PartnerState(APIView):
         if request.user.type != 'shop':
             return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
 
-        shop = request.user.shop
-        serializer = ShopSerializer(shop)
+        shop = Shop.objects.filter(url=request.data['url'])
+        serializer = ShopSerializer(shop, many=True)
         return Response(serializer.data)
 
     # изменить текущий статус
