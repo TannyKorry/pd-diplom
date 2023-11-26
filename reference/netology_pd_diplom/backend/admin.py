@@ -47,7 +47,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(ProductInfo)
 class ProductInfoAdmin(admin.ModelAdmin):
-    list_display = ['updated_at', 'shop', 'model']
+    list_display = ['id', 'updated_at', 'shop', 'model']
     inlines = [ProductParameterInline, ]
 
 
@@ -63,14 +63,21 @@ class ProductParameterAdmin(admin.ModelAdmin):
     list_filter = ['product_info', 'parameter', ]
 
 
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['id', 'dt', 'state', 'user_id']
+    list_filter = ['state', 'user_id', 'dt']
+    inlines = [OrderItemInline, ]
 
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['id', 'order_id', 'order', 'product_info', 'quantity']
 
 
 @admin.register(Contact)

@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django_rest_passwordreset.tokens import get_token_generator
 
 STATE_CHOICES = (
-    ('basket', 'Статус корзины'),
+    ('basket', 'Корзина'),
     ('new', 'Новый'),
     ('confirmed', 'Подтвержден'),
     ('assembled', 'Собран'),
@@ -161,6 +161,8 @@ class ProductInfo(models.Model):
         verbose_name = 'Данные о продукте(Pricat)'
         verbose_name_plural = "Список данных о продуктах(Pricat)"
 
+    def __str__(self):
+        return f'{self.external_id} {self.model}'
 
 
 class Parameter(models.Model):
