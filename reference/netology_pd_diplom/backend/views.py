@@ -231,7 +231,20 @@ class BasketView(APIView):
                 objects_created = 0
                 items = []
                 for order_item in items_list:
+
+                    # проверка наличия запрашиваемой позиции в требуемом количестве
+                    item = ProductInfo.objects.filter(
+                        id=order_item['product_info']).prefetch_related(
+                        'ordered_items__product_info__product__quantity')
+
+                    stoсk = [i.quantity for i in item]
+                    print(f'запрошено: {order_item}')
+                    if stoсk[0] < order_item['quantity']:
+                        order_item['quantity'] = stoсk[0]
+                        print(f'положено: {order_item}')
+
                     order_item.update({'order': basket.id})
+
                     serializer = OrderItemSerializer(data=order_item)
                     if serializer.is_valid():
                         try:
@@ -244,7 +257,7 @@ class BasketView(APIView):
                     else:
                         JsonResponse({'Status': False, 'Errors': serializer.errors})
 
-                return JsonResponse({'Status': True, 'Создано объектов': objects_created, 'Записано': items})
+                return JsonResponse({'Status': True, 'Создано объектов': [objects_created, items]})
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
 
     # удалить товары из корзины
@@ -282,17 +295,18 @@ class BasketView(APIView):
         if items_str:
             try:
                 items_list = json.loads(items_str)
-
+                print(type(items_list), items_list)
             except ValueError:
                 JsonResponse({'Status': False, 'Errors': 'Неверный формат запроса'})
             else:
                 basket, _ = Order.objects.get_or_create(user_id=request.user.id, state='basket')
                 objects_updated = 0
                 for order_item in items_list:
-                    print(type(order_item), order_item)
                     if isinstance(order_item['id'], int) and isinstance(order_item['quantity'], int):
-                        objects_updated += OrderItem.objects.filter(order_id=basket.id, id=order_item['id']).update(
+
+                        objects_updated = OrderItem.objects.filter(order_id=basket.id, id=order_item['id']).update(
                             quantity=order_item['quantity'])
+
 
                 return JsonResponse({'Status': True, 'Обновлено объектов': objects_updated})
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
@@ -474,7 +488,7 @@ class ContactView(APIView):
 
             if objects_deleted:
                 deleted_count = Contact.objects.filter(query).delete()[0]
-                print(deleted_count)
+
                 return JsonResponse({'Status': True, 'Удалено объектов': deleted_count})
         return JsonResponse({'Status': False, 'Errors': 'У вас нет контактных данных'})
 
