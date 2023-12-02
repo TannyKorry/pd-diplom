@@ -79,7 +79,7 @@ class ConfirmAccount(APIView):
                 token.user.is_active = True
                 token.user.save()
                 token.delete()
-                return JsonResponse({'Status': True})
+                return JsonResponse({'Status': True, 'Приветствие:': f'Пользователь {request.data["email"]} успешно зарегистрирован'})
             else:
                 return JsonResponse({'Status': False, 'Errors': 'Неправильно указан токен или email'})
 
@@ -142,7 +142,7 @@ class LoginAccount(APIView):
                 if user.is_active:
                     token, _ = Token.objects.get_or_create(user=user)
 
-                    return JsonResponse({'Status': True, 'Token': token.key})
+                    return JsonResponse({'Status': True, 'Token': token.key}, user=user)
 
             return JsonResponse({'Status': False, 'Errors': 'Не удалось авторизовать'})
 
@@ -212,7 +212,7 @@ class BasketView(APIView):
         serializer = OrderSerializer(basket, many=True)
         return Response(serializer.data)
 
-    # редактировать корзину
+    # добавить позиции в корзину
     def post(self, request, *args, **kwargs):
 
         if not request.user.is_authenticated:
@@ -232,16 +232,13 @@ class BasketView(APIView):
                 items = []
                 for order_item in items_list:
 
-                    # проверка наличия запрашиваемой позиции в требуемом количестве
-                    item = ProductInfo.objects.filter(
-                        id=order_item['product_info']).prefetch_related(
-                        'ordered_items__product_info__product__quantity')
+                    # проверка наличия запрашиваемой позиции в требуемом количестве,
+                    # если в запросе больше, в корзину добавится сколько есть в наличии
+                    item = ProductInfo.objects.filter(id=order_item['product_info'])
 
-                    stoсk = [i.quantity for i in item]
-                    print(f'запрошено: {order_item}')
-                    if stoсk[0] < order_item['quantity']:
-                        order_item['quantity'] = stoсk[0]
-                        print(f'положено: {order_item}')
+                    stoсk = [i.quantity for i in item][0]
+                    if stoсk < order_item['quantity']:
+                        order_item['quantity'] = stoсk
 
                     order_item.update({'order': basket.id})
 
@@ -275,17 +272,16 @@ class BasketView(APIView):
             for order_item_id in items_list:
                 if order_item_id.isdigit():
                     query = query | Q(order_id=basket.id, id=order_item_id)
-                    print(query)
 
                     objects_deleted = True
 
             if objects_deleted:
                 deleted_count = OrderItem.objects.filter(query).delete()[0]
-                print(deleted_count)
+
                 return JsonResponse({'Status': True, 'Удалено объектов': deleted_count})
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
 
-    # добавить позиции в корзину
+    # редактировать корзину
     def put(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
@@ -295,20 +291,32 @@ class BasketView(APIView):
         if items_str:
             try:
                 items_list = json.loads(items_str)
-                print(type(items_list), items_list)
+
             except ValueError:
                 JsonResponse({'Status': False, 'Errors': 'Неверный формат запроса'})
             else:
                 basket, _ = Order.objects.get_or_create(user_id=request.user.id, state='basket')
                 objects_updated = 0
+
                 for order_item in items_list:
+
                     if isinstance(order_item['id'], int) and isinstance(order_item['quantity'], int):
 
-                        objects_updated = OrderItem.objects.filter(order_id=basket.id, id=order_item['id']).update(
+                        # проверка наличия запрашиваемой позиции в требуемом количестве,
+                        # если в запросе больше, в корзину добавится сколько есть в наличии
+
+                        pricat_id = [i.product_info_id for i in OrderItem.objects.filter(id=order_item['id'])][0]
+                        item = ProductInfo.objects.filter(id=pricat_id)
+                        stoсk = [i.quantity for i in item][0]
+
+                        if stoсk < order_item['quantity']:
+                            order_item['quantity'] = stoсk
+
+                        objects_updated += OrderItem.objects.filter(order_id=basket.id, id=order_item['id']).update(
                             quantity=order_item['quantity'])
 
-
-                return JsonResponse({'Status': True, 'Обновлено объектов': objects_updated})
+                return JsonResponse({'Status': True, 'Обновлено объектов': objects_updated,
+                                     'Позиция': order_item['id'], 'Количество в корзине': order_item['quantity']})
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
 
 
@@ -410,6 +418,7 @@ class PartnerOrders(APIView):
 
         if request.user.type != 'shop':
             return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
+
 
         order = Order.objects.filter(
             ordered_items__product_info__shop__user_id=request.user.id).exclude(state='basket').prefetch_related(
@@ -517,7 +526,7 @@ class ContactView(APIView):
 
 class OrderView(APIView):
     """
-    Класс для получения и размешения заказов пользователями
+    Класс для получения и размещения заказов пользователями
     """
 
     # получить мои заказы
@@ -540,11 +549,16 @@ class OrderView(APIView):
 
         if {'id', 'contact'}.issubset(request.data):
             if request.data['id'].isdigit():
+
                 try:
                     is_updated = Order.objects.filter(
                         user_id=request.user.id, id=request.data['id']).update(
                         contact_id=request.data['contact'],
                         state='new')
+                    #####
+                    orde = Order.objects.filter(
+                        user_id=request.user.id).select_related('contact')
+                    print(orde)
                 except IntegrityError as error:
                     print(error)
                     return JsonResponse({'Status': False, 'Errors': 'Неправильно указаны аргументы'})

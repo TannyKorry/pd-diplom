@@ -252,7 +252,8 @@ class OrderItem(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['order_id', 'product_info'], name='unique_order_item'),
         ]
-
+    def __str__(self):
+        return f'{self.order}, {self.product_info}, {self.quantity}'
 
 class ConfirmEmailToken(models.Model):
     class Meta:
