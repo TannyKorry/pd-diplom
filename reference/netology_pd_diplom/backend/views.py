@@ -418,13 +418,18 @@ class PartnerOrders(APIView):
 
         if request.user.type != 'shop':
             return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
-
+        shop = Shop.objects.filter(user_id=request.user.id)
+        shop_id = [s.id for s in shop][0]
         order = Order.objects.filter(
             ordered_items__product_info__shop__user_id=request.user.id).exclude(state='basket').prefetch_related(
             'ordered_items__product_info__product__category',
             'ordered_items__product_info__product_parameters__parameter').select_related('contact').annotate(
             total_sum=Sum(F('ordered_items__quantity') * F('ordered_items__product_info__price'))).distinct()
-
+        # order = Order.objects.filter(
+        #     ordered_items__product_info__shop=shop_id).exclude(state='basket').prefetch_related(
+        #     'ordered_items__product_info__product__category',
+        #     'ordered_items__product_info__product_parameters__parameter').select_related('contact').annotate(
+        #     total_sum=Sum(F('ordered_items__quantity') * F('ordered_items__product_info__price'))).distinct()
         serializer = OrderSerializer(order, many=True)
         return Response(serializer.data)
 

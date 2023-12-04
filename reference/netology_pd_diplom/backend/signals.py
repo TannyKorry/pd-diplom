@@ -69,14 +69,17 @@ def new_order_signal(user_id, order_id, **kwargs):
     # send an e-mail to the user
     user = User.objects.get(id=user_id)
     order = Order.objects.get(id=order_id)
-
+    link = '<a href="https://127.0.0.1:8000">Home</a>'
     msg = EmailMultiAlternatives(
         # title:
-        f"Обновление статуса заказа",
+        f'Заказ сформирован',
         # message:
-        f'Ваш заказ № {order.id} сформирован\n\n\n'
-        f'Изменения статуса заказа можно увидеть в личном кабинете\n\n\n'
-        f'Спасибо за заказ',
+        f'Номер вашего заказа:  {order.id}.\n\n'
+        f'Наш оператор свяжется с вами в ближайшее время для уточнения деталей заказа\n\n'
+        f'Изменения статуса заказа можно увидеть в вашем личном кабинете \n\n'
+        f'Чтобы перейти на сайт нажмите здесь: http://127.0.0.1:8000\n\n\n'
+        f'Спасибо за заказ!',
+
         # from:
         settings.EMAIL_HOST_USER,
         # to:
