@@ -142,7 +142,7 @@ class LoginAccount(APIView):
                 if user.is_active:
                     token, _ = Token.objects.get_or_create(user=user)
 
-                    return JsonResponse({'Status': True, 'Token': token.key}, user=user)
+                    return JsonResponse({'Status': True, 'Token': token.key})
 
             return JsonResponse({'Status': False, 'Errors': 'Не удалось авторизовать'})
 
@@ -419,7 +419,6 @@ class PartnerOrders(APIView):
         if request.user.type != 'shop':
             return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
 
-
         order = Order.objects.filter(
             ordered_items__product_info__shop__user_id=request.user.id).exclude(state='basket').prefetch_related(
             'ordered_items__product_info__product__category',
@@ -556,15 +555,15 @@ class OrderView(APIView):
                         contact_id=request.data['contact'],
                         state='new')
                     #####
-                    orde = Order.objects.filter(
+                    order = Order.objects.filter(
                         user_id=request.user.id).select_related('contact')
-                    print(orde)
+                    order_id = request.data['id']
                 except IntegrityError as error:
                     print(error)
                     return JsonResponse({'Status': False, 'Errors': 'Неправильно указаны аргументы'})
                 else:
                     if is_updated:
-                        new_order.send(sender=self.__class__, user_id=request.user.id)
+                        new_order.send(sender=self.__class__, user_id=request.user.id, order_id=order_id)
                         return JsonResponse({'Status': True})
 
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})

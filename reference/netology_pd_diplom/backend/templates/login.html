@@ -1,98 +1,14 @@
-<!--{% extends "base.html" %}-->
-
-<!--{% load i18n %}-->
-
-<!--{% block head_links %}-->
-
-<!--<title> Регистрация</title>-->
-
-<!--{% endblock %}-->
-
-<!--{% block head_title %}{% trans "Sign In" %} {% endblock %}-->
-
-<!--{% block content %}-->
-<!--<div class="container-fluid">-->
-
-<!-- {% block messages %}-->
-<!--    {% if messages %}-->
-<!--    <div>-->
-<!--        <ul>-->
-<!--        {% for message in messages %}-->
-<!--        <div class="alert alert-warning alert-dismissible fade show" role="alert">-->
-<!--                <strong>{{message}}</strong>-->
-<!--                <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
-<!--                    <span aria-hidden="true">&times;</span>-->
-<!--                </button>-->
-<!--        </div>-->
-<!--        {% endfor %}-->
-<!--        </ul>-->
-<!--    </div>-->
-<!--    {% endif %}-->
-<!--  {% endblock %}-->
-
-<!--<h3 class="h3" id="head_banner">{% trans "Sign In" %}</h3>-->
-
-<!--<form class="container-fluid text-center" id="login_form" method="POST" action="{% url 'api/v1/user/login' %}">-->
-<!--  {% csrf_token %}-->
-
-<!--  {{ form.as_p }}-->
-
-<!--  {% if redirect_field_value %}-->
-
-<!--    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />-->
-
-<!--  {% endif %}-->
-
-<!--  <button  class="btn btn-outline-primary " type="submit">{% trans "Sign In" %}</button>-->
-<!--  <a  class="btn btn-outline-dark" href="{% url 'account_reset_password' %}">{% trans "Forgot Password ?" %}</a>-->
-
-<!--</form>-->
-<!--    {% load account socialaccount %}-->
-
-<!--    {% get_providers as socialaccount_providers %}-->
-<!--    <ul class="social_providers_list">-->
-<!--    {% for provider in socialaccount_providers %}-->
-<!--        <a title="{{provider.name}}" class="btn btn-outline-dark"-->
-<!--         href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}"><i class="fa fa-{{provider.name}}" id="social_icon"></i>{{provider.name}}</a>-->
-<!--    {% endfor %}-->
-<!--    </ul>-->
-<!--</div>-->
-<!--{% endblock %}-->
-
-
-
-
 {% extends "base.html" %}
-{% load i18n %}
-{% load allauth account %}
-{% block head_title %}
-    {% trans "Sign In" %}
-{% endblock head_title %}
+{% load static %}
+
+{% block title %}Страница входа{% endblock %}
+
 {% block content %}
-    {% element h1 %}
-        {% trans "Sign In" %}
-    {% endelement %}
-    <p>
-        {% blocktrans %}If you have not created an account yet, then please
-    <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}
-    </p>
-    {% url 'login' as login_url %}
-    {% element form form=form method="post" action=user-login tags="entrance,login" %}
-        {% slot body %}
-            {% csrf_token %}
-            {% element fields form=form unlabeled=True %}
-            {% endelement %}
-            {% if redirect_field_value %}
-                <input type="hidden"
-                       name="{{ redirect_field_name }}"
-                       value="{{ redirect_field_value }}" />
-            {% endif %}
-        {% endslot %}
-        {% slot actions %}
-            {% element button type="submit" tags="prominent,login" %}
-                {% trans "Sign In" %}
-            {% endelement %}
-        {% endslot %}
-    {% endelement %}
-    {% include "login.html" with page_layout="entrance" %}
-{% endblock content %}
+<h2>Войти</h2>
+<form method="post">
+  {% csrf_token %}
+    {% element fields form=form unlabeled=True %}
+  {{ form.as_p }}
+  <button type="submit">Войти</button>
+</form>
+{% endblock %}
