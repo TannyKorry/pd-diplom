@@ -15,7 +15,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from ujson import loads as load_json
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from yaml import load as load_yaml, Loader
 
 
@@ -56,7 +57,8 @@ class RegisterAccount(APIView):
                     user.set_password(request.data['password'])
                     user.save()
                     new_user_registered.send(sender=self.__class__, user_id=user.id)
-                    return JsonResponse({'Status': True, 'Message': 'На ваш email отправлено письмо с кодом подтверждения'}, status=201)
+                    return JsonResponse({'Status': True,
+                                         'Message': 'На ваш email отправлено письмо с кодом подтверждения'}, status=201)
                 else:
                     return JsonResponse({'Status': False, 'Errors': user_serializer.errors})
 
@@ -132,7 +134,6 @@ class LoginAccount(APIView):
     """
     Класс для авторизации пользователей
     """
-
     def post(self, request, *args, **kwargs):
 
         if {'email', 'password'}.issubset(request.data):
@@ -155,6 +156,10 @@ class CategoryView(ListAPIView):
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['name', ]
+    search_fields = ['name', ]
+    ordering_fields = ['id', 'name', 'shop']
 
 
 class ShopView(ListAPIView):
@@ -344,7 +349,7 @@ class PartnerUpdate(APIView):
                 data = load_yaml(stream, Loader=Loader)
 
                 shop, _ = Shop.objects.get_or_create(name=data['shop'])
-                shop_up = Shop.objects.filter(name=data['shop']).update(url=url, user_id=request.user.id)
+                Shop.objects.filter(name=data['shop']).update(url=url, user_id=request.user.id)
 
                 for category in data['categories']:
                     category_object, _ = Category.objects.get_or_create(id=category['id'], name=category['name'])
@@ -368,7 +373,7 @@ class PartnerUpdate(APIView):
                                                         parameter_id=parameter_object.id,
                                                         value=value)
 
-                return JsonResponse({'Status': True, '': 'The data has been uploaded'})
+                return JsonResponse({'Status': True, 'Message': 'The data has been uploaded'})
 
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
 
@@ -418,18 +423,12 @@ class PartnerOrders(APIView):
 
         if request.user.type != 'shop':
             return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
-        shop = Shop.objects.filter(user_id=request.user.id)
-        shop_id = [s.id for s in shop][0]
         order = Order.objects.filter(
             ordered_items__product_info__shop__user_id=request.user.id).exclude(state='basket').prefetch_related(
             'ordered_items__product_info__product__category',
             'ordered_items__product_info__product_parameters__parameter').select_related('contact').annotate(
             total_sum=Sum(F('ordered_items__quantity') * F('ordered_items__product_info__price'))).distinct()
-        # order = Order.objects.filter(
-        #     ordered_items__product_info__shop=shop_id).exclude(state='basket').prefetch_related(
-        #     'ordered_items__product_info__product__category',
-        #     'ordered_items__product_info__product_parameters__parameter').select_related('contact').annotate(
-        #     total_sum=Sum(F('ordered_items__quantity') * F('ordered_items__product_info__price'))).distinct()
+
         serializer = OrderSerializer(order, many=True)
         return Response(serializer.data)
 
@@ -527,7 +526,6 @@ class ContactView(APIView):
         return JsonResponse({'Status': False, 'Errors': 'У вас пока нет контактных данных'})
 
 
-
 class OrderView(APIView):
     """
     Класс для получения и размещения заказов пользователями
@@ -553,15 +551,12 @@ class OrderView(APIView):
 
         if {'id', 'contact'}.issubset(request.data):
             if request.data['id'].isdigit():
-
                 try:
                     is_updated = Order.objects.filter(
                         user_id=request.user.id, id=request.data['id']).update(
                         contact_id=request.data['contact'],
                         state='new')
-                    #####
-                    order = Order.objects.filter(
-                        user_id=request.user.id).select_related('contact')
+
                     order_id = request.data['id']
                 except IntegrityError as error:
                     print(error)

@@ -31,7 +31,7 @@ def password_reset_token_created(sender, instance, reset_password_token, **kwarg
         # title:
         f"Password Reset Token for {reset_password_token.user}",
         # message:
-        reset_password_token.key,
+        f"Токен для сброса пароля {reset_password_token.key}",
         # from:
         settings.EMAIL_HOST_USER,
         # to:
@@ -43,7 +43,7 @@ def password_reset_token_created(sender, instance, reset_password_token, **kwarg
 @receiver(new_user_registered)
 def new_user_registered_signal(user_id, **kwargs):
     """
-    отправляем письмо с подтвердждением почты
+    отправляем письмо с подтверждением почты
     """
     # send an e-mail to the user
     token, _ = ConfirmEmailToken.objects.get_or_create(user_id=user_id)
@@ -52,7 +52,7 @@ def new_user_registered_signal(user_id, **kwargs):
         # title:
         f"Email Confirmation Token {token.user.email}",
         # message:
-        token.key,
+        f"Токен для подтверждения email {token.key}",
         # from:
         settings.EMAIL_HOST_USER,
         # to:

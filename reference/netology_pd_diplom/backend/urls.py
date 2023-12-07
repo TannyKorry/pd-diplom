@@ -6,6 +6,7 @@ from .views import PartnerUpdate, RegisterAccount, LoginAccount, CategoryView, S
     AccountDetails, ContactView, OrderView, PartnerState, PartnerOrders, ConfirmAccount
 
 app_name = 'backend'
+
 urlpatterns = [
     path('partner/update', PartnerUpdate.as_view(), name='partner-update'),
     path('partner/state', PartnerState.as_view(), name='partner-state'),
@@ -24,5 +25,4 @@ urlpatterns = [
     path('products', ProductInfoView.as_view(), name='shops'),
     path('basket', BasketView.as_view(), name='basket'),
     path('order', OrderView.as_view(), name='order'),
-
 ]

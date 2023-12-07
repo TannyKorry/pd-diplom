@@ -6,3 +6,4 @@ pyyaml
 ujson
 requests
 django-allauth
+django-filter
