@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User, Shop, Category, Product, ProductInfo, Parameter, ProductParameter, Order, OrderItem, \
+from .models import User, Shop, Category, Product, ProductInfo, Parameter, \
+    ProductParameter, Order, OrderItem, \
     Contact, ConfirmEmailToken
 
 
@@ -14,13 +15,16 @@ class CustomUserAdmin(UserAdmin):
 
     fieldsets = (
         (None, {'fields': ('email', 'password', 'type')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'company', 'position')}),
+        ('Personal info', {'fields': (
+            'first_name', 'last_name', 'company', 'position')}),
         ('Permissions', {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+            'fields': ('is_active', 'is_staff', 'is_superuser',
+                       'groups', 'user_permissions'),
         }),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
-    list_display = ('id', 'email', 'first_name', 'last_name', 'position', 'company', 'is_staff', 'type', 'is_active', )
+    list_display = ('id', 'email', 'first_name', 'last_name',
+                    'position', 'company', 'is_staff', 'type', 'is_active', )
 
 
 @admin.register(Shop)
