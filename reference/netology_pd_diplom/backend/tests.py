@@ -20,7 +20,8 @@ class UserTestCase(APITestCase):
             company="CompanyBuyer",
             position="PositionBuyer")
         user1.is_active = True
-
+        user1.save()
+        self.token1 = Token.objects.create(user=user1)
 
         user2 = User.objects.create(
             first_name="NameSeller",
@@ -31,15 +32,48 @@ class UserTestCase(APITestCase):
             position="PositionSeller",
             type="shop")
         user2.is_active = True
-
-        self.token1 = Token.objects.create(user=user1)
-
+        user2.save()
         self.token2 = Token.objects.create(user=user2)
 
         Shop.objects.create(name='TestShop1')
-        Shop.objects.create(name='TestShop2')
 
         Category.objects.create(name='TestCategory1')
+        Category.objects.create(name='TestCategory2')
+
+    # def test_user_register(self):
+    #     """ Проверка регистрации пользователя """
+    #
+    #     data = {
+    #         'first_name': "NameBuyer",
+    #         'last_name': "FamilyBuyer",
+    #         'email': "Buyer@test.ru",
+    #         'password': "PasswordBuyer",
+    #         'company': "CompanyBuyer",
+    #         'position': "PositionBuyer"
+    #         }
+    #     response = self.client.post(self.url + 'user/register', data=data, format='json')
+    #     self.assertEqual(response.status_code, 201)
+
+    def test_get_contacts_user(self):
+        """ Проверка запроса контакта пользователя """
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + str(self.token1))
+        response = self.client.get(self.url + 'user/contact')
+
+        self.assertEqual(response.status_code, 200)
+
+    # def test_create_contacts_user(self):
+    #     """ Проверка создания контакта пользователя """
+    #     data = {
+    #         'city': "Almaty",
+    #         'street': "Shashkin",
+    #         'house': 28,
+    #         'apartment': 123,
+    #         'phone': '+ 49564563242'
+    #     }
+    #     self.client.credentials(HTTP_AUTHORIZATION='Token ' + str(self.token1))
+    #     response = self.client.post(self.url + 'user/contact', data=data, )
+    #
+    #     self.assertEqual(response.status_code, 201)
 
 
     def test_user_login(self):
@@ -52,6 +86,7 @@ class UserTestCase(APITestCase):
 
         self.assertEqual(response.status_code, 200)
 
+
     def test_get_list_shops(self):
         """ Проверка запроса списка магазинов """
 
@@ -60,7 +95,8 @@ class UserTestCase(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(data['results'], list)
-        self.assertEqual(len(data['results']), 2)
+        self.assertEqual(len(data['results']), 1)
+
 
     def test_get_list_categories(self):
         """ Проверка запроса списка категорий """
@@ -70,27 +106,10 @@ class UserTestCase(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(data['results'], list)
-        self.assertEqual(len(data['results']), 1)
-
-
-    # def test_user_register(self, **kwargs):
-    #     data = {
-    #         'first_name': "NameBuyer",
-    #         'last_name': "FamilyBuyer",
-    #         'email': "Buyer@test.ru",
-    #         'password': "PasswordBuyer",
-    #         'company': "CompanyBuyer",
-    #         'position': "PositionBuyer"
-    #         }
-    #     response = self.client.post(self.url + 'user/register', **data)
-    #     self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(data['results']), 2)
 
 
 
-    def test_get_contacts_user(self):
-        """ Проверка запроса контакта пользователя """
 
-        response = self.client.get(self.url + 'user/contact',
-            headers={'Authorization': 'Token ' + str(self.token1)})
 
-        self.assertEqual(response.status_code, 200)
+
